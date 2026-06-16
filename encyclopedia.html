@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WikiVault – Encyclopedia</title>
+  <meta name="description" content="WikiVault – A premium encyclopedia portal. Login to explore curated knowledge." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET & BASE ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #0d0f1a;
+      --surface:   #141728;
+      --card:      #1a1f35;
+      --border:    rgba(255,255,255,0.08);
+      --accent:    #7c6ef5;
+      --accent2:   #5eead4;
+      --accent3:   #f472b6;
+      --text:      #e8eaf0;
+      --muted:     #7a7f9a;
+      --danger:    #f87171;
+      --success:   #34d399;
+      --radius:    14px;
+      --shadow:    0 20px 60px rgba(0,0,0,0.5);
+    }
+    html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); scroll-behavior: smooth; }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+    /* ═══════════════════════════
+       LOGIN PAGE
+    ═══════════════════════════ */
+    #login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated gradient background */
+    #login-page::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 20% 40%, rgba(124,110,245,0.18) 0%, transparent 60%),
+                  radial-gradient(ellipse 60% 80% at 80% 20%, rgba(94,234,212,0.12) 0%, transparent 60%),
+                  radial-gradient(ellipse 70% 50% at 60% 90%, rgba(244,114,182,0.10) 0%, transparent 60%);
+      animation: bgPulse 8s ease-in-out infinite alternate;
+    }
+    @keyframes bgPulse {
+      0%   { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 1;   transform: scale(1.05); }
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      animation: float linear infinite;
+      pointer-events: none;
+    }
+    .orb1 { width:300px; height:300px; background:rgba(124,110,245,0.15); top:-80px; left:-80px; animation-duration:20s; }
+    .orb2 { width:200px; height:200px; background:rgba(94,234,212,0.12); bottom:-60px; right:-60px; animation-duration:15s; animation-direction:reverse; }
+    .orb3 { width:150px; height:150px; background:rgba(244,114,182,0.10); top:50%; right:10%; animation-duration:25s; }
+    @keyframes float {
+      0%   { transform: translateY(0) rotate(0deg); }
+      50%  { transform: translateY(-30px) rotate(180deg); }
+      100% { transform: translateY(0) rotate(360deg); }
+    }
+
+    .login-box {
+      position: relative;
+      z-index: 10;
+      width: 420px;
+      max-width: 94vw;
+      background: rgba(20, 23, 40, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 40px;
+      box-shadow: var(--shadow), 0 0 0 1px rgba(124,110,245,0.12) inset;
+      animation: slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform:translateY(40px) scale(0.95); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .logo-icon {
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 8px 24px rgba(124,110,245,0.35);
+    }
+    .logo-text { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #fff 30%, var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .login-tagline { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+
+    .field { margin-bottom: 20px; }
+    .field label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .field input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+    }
+    .field input:focus {
+      border-color: var(--accent);
+      background: rgba(124,110,245,0.08);
+      box-shadow: 0 0 0 3px rgba(124,110,245,0.15);
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.2); }
+
+    .error-msg {
+      background: rgba(248,113,113,0.12);
+      border: 1px solid rgba(248,113,113,0.3);
+      color: var(--danger);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      display: none;
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%,60%  { transform: translateX(-6px); }
+      40%,80%  { transform: translateX(6px); }
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--accent), #9b8cf8);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 6px 24px rgba(124,110,245,0.4);
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(124,110,245,0.5); }
+    .btn-login:active { transform: scale(0.98); }
+    .btn-login::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .btn-login:hover::after { opacity: 1; }
+
+    .login-hint { text-align:center; margin-top:20px; font-size:12px; color:var(--muted); }
+    .login-hint span { color: var(--accent2); }
+
+    /* ═══════════════════════════
+       ENCYCLOPEDIA PAGE
+    ═══════════════════════════ */
+    #wiki-page { display: none; min-height: 100vh; }
+
+    /* NAVBAR */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,15,26,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display:flex; align-items:center; gap:10px; }
+    .nav-logo .logo-icon { width:36px; height:36px; font-size:17px; border-radius:9px; }
+    .nav-logo .logo-text { font-size:20px; }
+    .nav-search {
+      flex: 1; max-width: 400px; margin: 0 32px;
+      position: relative;
+    }
+    .nav-search input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 16px 9px 38px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .nav-search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,110,245,0.12); }
+    .nav-search .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:0.4; font-size:15px; }
+    .nav-right { display:flex; align-items:center; gap:16px; }
+    .user-badge {
+      display:flex; align-items:center; gap:8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size:13px; color:var(--muted);
+    }
+    .user-badge .avatar {
+      width:26px; height:26px; border-radius:50%;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:#fff;
+    }
+    .btn-logout {
+      background: rgba(248,113,113,0.12);
+      border: 1px solid rgba(248,113,113,0.25);
+      color: var(--danger);
+      border-radius:8px; padding:7px 16px;
+      font-size:13px; font-weight:500; cursor:pointer;
+      transition: background 0.2s, transform 0.2s;
+      font-family:'Inter',sans-serif;
+    }
+    .btn-logout:hover { background:rgba(248,113,113,0.2); transform:translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, rgba(124,110,245,0.12) 0%, rgba(94,234,212,0.06) 50%, rgba(244,114,182,0.06) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 56px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content:'';
+      position:absolute; inset:0;
+      background: radial-gradient(ellipse 60% 100% at 50% 100%, rgba(124,110,245,0.08), transparent);
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 20%, var(--accent) 60%, var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1.2; margin-bottom: 16px;
+    }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 560px; margin: 0 auto 28px; }
+    .hero-stats { display:flex; justify-content:center; gap:40px; flex-wrap:wrap; }
+    .stat { text-align:center; }
+    .stat-num { font-size:24px; font-weight:700; color:var(--accent2); }
+    .stat-lbl { font-size:12px; color:var(--muted); margin-top:2px; text-transform:uppercase; letter-spacing:1px; }
+
+    /* CATEGORIES */
+    .categories-bar {
+      padding: 20px 32px;
+      border-bottom: 1px solid var(--border);
+      display:flex; gap:10px; flex-wrap:wrap;
+      background: var(--surface);
+    }
+    .cat-btn {
+      padding: 7px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size:13px; font-weight:500;
+      cursor:pointer; font-family:'Inter',sans-serif;
+      transition: all 0.25s;
+    }
+    .cat-btn:hover, .cat-btn.active {
+      background: linear-gradient(135deg, var(--accent), #9b8cf8);
+      color:#fff; border-color:transparent;
+      box-shadow: 0 4px 16px rgba(124,110,245,0.3);
+    }
+
+    /* MAIN CONTENT */
+    .main-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 32px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 32px;
+    }
+
+    /* SIDEBAR */
+    .sidebar { display:flex; flex-direction:column; gap:20px; }
+    .sidebar-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .sidebar-card h3 { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:14px; }
+    .toc-item {
+      display:flex; align-items:center; gap:10px;
+      padding:8px 10px; border-radius:8px;
+      cursor:pointer; font-size:14px; color:var(--muted);
+      transition: all 0.2s;
+      text-decoration:none;
+    }
+    .toc-item:hover { background:rgba(124,110,245,0.1); color:var(--text); }
+    .toc-item.active { background:rgba(124,110,245,0.15); color:var(--accent); }
+    .toc-dot { width:6px;height:6px;border-radius:50%; flex-shrink:0; }
+
+    .featured-badge {
+      background: linear-gradient(135deg, rgba(244,114,182,0.15), rgba(124,110,245,0.15));
+      border: 1px solid rgba(244,114,182,0.2);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor:pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .featured-badge:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+    .featured-badge .fb-tag { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--accent3); font-weight:600; margin-bottom:4px; }
+    .featured-badge .fb-title { font-size:13px; font-weight:500; }
+    .featured-badge .fb-desc { font-size:11px; color:var(--muted); margin-top:2px; }
+
+    /* ARTICLES GRID */
+    .articles-area { display:flex; flex-direction:column; gap:28px; }
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+    .section-header h2 { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; }
+    .section-header .see-all { font-size:13px; color:var(--accent); cursor:pointer; text-decoration:none; }
+    .section-header .see-all:hover { text-decoration:underline; }
+
+    .cards-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:20px; }
+    .article-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      animation: fadeIn 0.5s ease both;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+    .article-card:hover { transform:translateY(-4px); box-shadow:0 16px 48px rgba(0,0,0,0.4); border-color:rgba(124,110,245,0.3); }
+    .card-thumb {
+      height: 140px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:52px;
+      position:relative; overflow:hidden;
+    }
+    .card-body { padding:16px; }
+    .card-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+    .tag {
+      padding:2px 10px; border-radius:20px;
+      font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;
+    }
+    .tag-science   { background:rgba(94,234,212,0.15);  color:var(--accent2); }
+    .tag-history   { background:rgba(244,114,182,0.15); color:var(--accent3); }
+    .tag-tech      { background:rgba(124,110,245,0.15); color:var(--accent); }
+    .tag-nature    { background:rgba(52,211,153,0.15);  color:var(--success); }
+    .tag-space     { background:rgba(147,197,253,0.15); color:#93c5fd; }
+    .tag-culture   { background:rgba(252,211,77,0.15);  color:#fcd34d; }
+    .card-body h3 { font-size:16px; font-weight:600; margin-bottom:6px; line-height:1.3; }
+    .card-body p  { font-size:13px; color:var(--muted); line-height:1.6; }
+    .card-meta { display:flex; align-items:center; justify-content:space-between; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); font-size:11px; color:var(--muted); }
+    .card-meta .read-time { display:flex; align-items:center; gap:4px; }
+
+    /* FEATURED ARTICLE BANNER */
+    .featured-article {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(124,110,245,0.1), rgba(94,234,212,0.06));
+      border: 1px solid rgba(124,110,245,0.2);
+      border-radius: 18px;
+      padding: 32px;
+      display:grid; grid-template-columns:1fr 200px;
+      gap:24px; align-items:center;
+      cursor:pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .featured-article:hover { transform:translateY(-3px); box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+    .fa-tag { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent2); font-weight:600; margin-bottom:8px; }
+    .fa-title { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; margin-bottom:10px; }
+    .fa-desc { color:var(--muted); font-size:14px; line-height:1.7; }
+    .fa-emoji { font-size:100px; text-align:center; }
+
+    /* ARTICLE MODAL */
+    .modal-overlay {
+      position:fixed; inset:0; z-index:1000;
+      background:rgba(0,0,0,0.7);
+      backdrop-filter:blur(6px);
+      display:none; align-items:center; justify-content:center;
+      padding:24px;
+      animation: overlayIn 0.3s ease;
+    }
+    @keyframes overlayIn { from{opacity:0;} to{opacity:1;} }
+    .modal-overlay.open { display:flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 720px; width:100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 40px;
+      position:relative;
+      animation: modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes modalIn { from{opacity:0;transform:scale(0.9) translateY(20px);} to{opacity:1;transform:scale(1) translateY(0);} }
+    .modal-close {
+      position:sticky; top:0; float:right;
+      background:rgba(255,255,255,0.08); border:1px solid var(--border);
+      border-radius:50%; width:32px;height:32px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer; font-size:16px; color:var(--muted);
+      transition:background 0.2s, color 0.2s;
+    }
+    .modal-close:hover { background:rgba(248,113,113,0.2); color:var(--danger); }
+    .modal-emoji { font-size:60px; margin-bottom:16px; }
+    .modal-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+    .modal h2 { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; margin-bottom:8px; }
+    .modal-meta { font-size:13px; color:var(--muted); margin-bottom:24px; display:flex; gap:16px; flex-wrap:wrap; }
+    .modal-content h3 { font-size:17px; font-weight:600; margin:20px 0 8px; color:var(--accent2); }
+    .modal-content p { font-size:14px; color:#b0b4c8; line-height:1.8; margin-bottom:12px; }
+    .modal-content ul { padding-left:20px; margin-bottom:12px; }
+    .modal-content li { font-size:14px; color:#b0b4c8; line-height:1.8; }
+    .modal-divider { border:none; border-top:1px solid var(--border); margin:20px 0; }
+    .modal-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding-top:16px; border-top:1px solid var(--border); }
+    .modal-footer .btn-share {
+      background:rgba(124,110,245,0.15); border:1px solid rgba(124,110,245,0.3);
+      color:var(--accent); border-radius:8px; padding:8px 18px;
+      font-size:13px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif;
+      transition:background 0.2s;
+    }
+    .modal-footer .btn-share:hover { background:rgba(124,110,245,0.25); }
+
+    /* RESPONSIVE */
+    @media(max-width:900px) {
+      .main-grid { grid-template-columns:1fr; }
+      .sidebar { display:none; }
+      .featured-article { grid-template-columns:1fr; }
+      .fa-emoji { display:none; }
+      .navbar { padding:0 16px; }
+      .nav-search { max-width:200px; margin:0 12px; }
+      .main-grid { padding:24px 16px; }
+    }
+    @media(max-width:600px) {
+      .login-box { padding:36px 24px; }
+      .hero { padding:40px 16px; }
+      .hero-stats { gap:24px; }
+      .categories-bar { padding:14px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+<div id="login-page">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-icon">📚</div>
+      <span class="logo-text">WikiVault</span>
+    </div>
+    <p class="login-tagline">Your gateway to curated knowledge. Sign in to explore.</p>
+
+    <div class="error-msg" id="error-msg">⚠️ Invalid username or password. Please try again.</div>
+
+    <div class="field">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your username" autocomplete="username" />
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" />
+    </div>
+
+    <button class="btn-login" id="login-btn" onclick="doLogin()">Sign In →</button>
+
+    <p class="login-hint">Demo credentials: <span>admin</span> / <span>admin</span></p>
+  </div>
+</div>
+
+<!-- ═══════════════ ENCYCLOPEDIA PAGE ═══════════════ -->
+<div id="wiki-page">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <div class="logo-icon">📚</div>
+      <span class="logo-text">WikiVault</span>
+    </div>
+    <div class="nav-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search articles…" oninput="filterArticles(this.value)" />
+    </div>
+    <div class="nav-right">
+      <div class="user-badge">
+        <div class="avatar">A</div>
+        <span>admin</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>The WikiVault Encyclopedia</h1>
+    <p>Explore thousands of meticulously curated articles across science, history, technology, culture, and beyond.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">12,480</div><div class="stat-lbl">Articles</div></div>
+      <div class="stat"><div class="stat-num">48</div><div class="stat-lbl">Categories</div></div>
+      <div class="stat"><div class="stat-num">3.2M</div><div class="stat-lbl">Readers</div></div>
+      <div class="stat"><div class="stat-num">Daily</div><div class="stat-lbl">Updates</div></div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="categories-bar">
+    <button class="cat-btn active" onclick="filterCat('all',this)">🌐 All</button>
+    <button class="cat-btn" onclick="filterCat('science',this)">🔬 Science</button>
+    <button class="cat-btn" onclick="filterCat('history',this)">🏛 History</button>
+    <button class="cat-btn" onclick="filterCat('tech',this)">💻 Technology</button>
+    <button class="cat-btn" onclick="filterCat('space',this)">🚀 Space</button>
+    <button class="cat-btn" onclick="filterCat('nature',this)">🌿 Nature</button>
+    <button class="cat-btn" onclick="filterCat('culture',this)">🎭 Culture</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-grid">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h3>Contents</h3>
+        <a class="toc-item active" href="#" onclick="scrollToSection('featured')"><span class="toc-dot" style="background:#7c6ef5"></span>Featured Article</a>
+        <a class="toc-item" href="#" onclick="scrollToSection('science')"><span class="toc-dot" style="background:#5eead4"></span>Science & Nature</a>
+        <a class="toc-item" href="#" onclick="scrollToSection('history')"><span class="toc-dot" style="background:#f472b6"></span>History & Culture</a>
+        <a class="toc-item" href="#" onclick="scrollToSection('tech')"><span class="toc-dot" style="background:#7c6ef5"></span>Technology</a>
+        <a class="toc-item" href="#" onclick="scrollToSection('space')"><span class="toc-dot" style="background:#93c5fd"></span>Space & Universe</a>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Today's Highlights</h3>
+        <div class="featured-badge" onclick="openModal('quantum')">
+          <div class="fb-tag">⚡ Physics</div>
+          <div class="fb-title">Quantum Entanglement</div>
+          <div class="fb-desc">Spooky action at a distance explained</div>
+        </div>
+        <div class="featured-badge" onclick="openModal('rome')">
+          <div class="fb-tag">🏛 History</div>
+          <div class="fb-title">The Fall of Rome</div>
+          <div class="fb-desc">Causes and consequences</div>
+        </div>
+        <div class="featured-badge" onclick="openModal('ai')">
+          <div class="fb-tag">🤖 Technology</div>
+          <div class="fb-title">Artificial Intelligence</div>
+          <div class="fb-desc">How machines learn to think</div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Did You Know?</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7" id="dyk-text"></p>
+      </div>
+    </aside>
+
+    <!-- ARTICLES AREA -->
+    <div class="articles-area" id="articles-area">
+
+      <!-- Featured -->
+      <div id="featured" class="featured-article" onclick="openModal('universe')">
+        <div>
+          <div class="fa-tag">⭐ Article of the Day</div>
+          <div class="fa-title">The Observable Universe: Scale and Structure</div>
+          <div class="fa-desc">At 93 billion light-years in diameter, the observable universe contains an estimated 2 trillion galaxies. Explore how astronomers map the cosmos, from the cosmic microwave background to the large-scale structure of galactic filaments and voids that define reality itself.</div>
+          <div style="margin-top:16px;display:flex;gap:8px;">
+            <span class="tag tag-space">Space</span>
+            <span class="tag tag-science">Science</span>
+          </div>
+        </div>
+        <div class="fa-emoji">🌌</div>
+      </div>
+
+      <!-- Cards grid – dynamically filtered -->
+      <div>
+        <div class="section-header">
+          <h2>All Articles</h2>
+          <span id="article-count" style="font-size:13px;color:var(--muted);"></span>
+        </div>
+        <div class="cards-grid" id="cards-grid"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal-body">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content-inner"></div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───
+const articles = [
+  {
+    id:'quantum', emoji:'⚛️', bg:'linear-gradient(135deg,#1a1f35,#0f1625)',
+    tags:['science'], labels:[{cls:'tag-science',txt:'Science'}],
+    title:'Quantum Entanglement',
+    excerpt:'When two particles become entangled, measuring one instantly affects the other — no matter the distance separating them.',
+    readTime:'8 min', date:'June 2026',
+    content: `
+      <h3>What Is Quantum Entanglement?</h3>
+      <p>Quantum entanglement is a phenomenon where two or more particles become correlated in such a way that the quantum state of each particle cannot be described independently of the others, even when separated by large distances.</p>
+      <p>Albert Einstein famously called it "spooky action at a distance" — a term he used disparagingly, believing it violated the principle of local realism. However, experiments since the 1970s, especially those by Alain Aspect, have confirmed that entanglement is a genuine feature of reality.</p>
+      <h3>How It Works</h3>
+      <p>When particles interact physically, they can become entangled. From that point on, measuring a property (like spin) of one particle instantly determines the corresponding property of its partner. The results appear random individually, but the correlations between results exceed what any classical explanation can account for.</p>
+      <ul>
+        <li>Entangled particles share a quantum state</li>
+        <li>Measurement of one "collapses" the shared state</li>
+        <li>No faster-than-light communication occurs (no information is transferred)</li>
+        <li>Entanglement is the foundation of quantum computing and quantum cryptography</li>
+      </ul>
+      <h3>Applications</h3>
+      <p>Entanglement powers the field of quantum information science. Quantum key distribution (QKD) uses entanglement to create theoretically unbreakable encryption. Quantum computers exploit entangled qubits to perform computations exponentially faster than classical computers for certain problems.</p>
+      <h3>Bell's Theorem</h3>
+      <p>In 1964, physicist John Bell devised a mathematical inequality that could distinguish quantum mechanics from any local hidden variable theory. Experiments have consistently violated Bell inequalities, conclusively proving that the universe is fundamentally non-local at the quantum scale.</p>
+    `
+  },
+  {
+    id:'rome', emoji:'🏛️', bg:'linear-gradient(135deg,#1f1520,#1a1015)',
+    tags:['history','culture'], labels:[{cls:'tag-history',txt:'History'},{cls:'tag-culture',txt:'Culture'}],
+    title:'The Fall of the Roman Empire',
+    excerpt:'One of history\'s greatest civilizations collapsed over centuries — but why? The answer involves economics, migration, military pressure, and political chaos.',
+    readTime:'12 min', date:'June 2026',
+    content: `
+      <h3>Background</h3>
+      <p>The Western Roman Empire officially fell in 476 CE when the Germanic chieftain Odoacer deposed the last emperor, Romulus Augustulus. But historians debate whether this date truly marks a "fall" or merely a transition in an already-transformed society.</p>
+      <h3>Key Causes</h3>
+      <ul>
+        <li><strong>Military overextension:</strong> Rome could no longer effectively defend its vast borders</li>
+        <li><strong>Economic decline:</strong> Inflation, trade disruption, and heavy taxation strangled the economy</li>
+        <li><strong>Political instability:</strong> Over 50 emperors in the 3rd century alone, many assassinated</li>
+        <li><strong>Migration of peoples:</strong> The Huns pushed Germanic tribes like the Visigoths into Roman territory</li>
+        <li><strong>Division of the Empire:</strong> The East (Byzantine) survived; the West crumbled</li>
+      </ul>
+      <h3>Edward Gibbon's View</h3>
+      <p>In his monumental work "The History of the Decline and Fall of the Roman Empire" (1776), Edward Gibbon argued that Christianity weakened Roman civic virtue by redirecting loyalty toward a spiritual kingdom and discouraging martial values. This view remains controversial among modern historians.</p>
+      <h3>Legacy</h3>
+      <p>Rome's fall did not end Roman civilization. Latin evolved into the Romance languages, Roman law became the basis of European legal systems, and Roman Catholic Christianity preserved classical learning. The Eastern Roman Empire (Byzantium) continued for another thousand years until 1453 CE.</p>
+    `
+  },
+  {
+    id:'ai', emoji:'🤖', bg:'linear-gradient(135deg,#0f1625,#1a1535)',
+    tags:['tech'], labels:[{cls:'tag-tech',txt:'Technology'}],
+    title:'Artificial Intelligence: How Machines Learn',
+    excerpt:'From neural networks to large language models, AI has transformed from science fiction into the defining technology of our era.',
+    readTime:'10 min', date:'June 2026',
+    content: `
+      <h3>What Is Artificial Intelligence?</h3>
+      <p>Artificial Intelligence (AI) refers to the simulation of human intelligence processes by computer systems. These include learning, reasoning, problem-solving, perception, and language understanding. Modern AI is dominated by machine learning — systems that improve through experience rather than explicit programming.</p>
+      <h3>A Brief History</h3>
+      <ul>
+        <li><strong>1950:</strong> Alan Turing proposes the Turing Test</li>
+        <li><strong>1956:</strong> Dartmouth Conference coins the term "Artificial Intelligence"</li>
+        <li><strong>1980s:</strong> Expert systems and rule-based AI flourish</li>
+        <li><strong>1997:</strong> Deep Blue defeats chess champion Garry Kasparov</li>
+        <li><strong>2012:</strong> Deep learning revolution with AlexNet</li>
+        <li><strong>2017:</strong> Transformer architecture is introduced</li>
+        <li><strong>2022-2026:</strong> Large Language Models reshape computing and society</li>
+      </ul>
+      <h3>How Neural Networks Work</h3>
+      <p>Inspired by the brain, artificial neural networks consist of layers of interconnected nodes (neurons). During training, the network adjusts millions of internal parameters (weights) to minimize error on a training dataset. Deep networks with many layers can learn remarkably complex patterns — from recognizing faces to writing essays.</p>
+      <h3>The Future</h3>
+      <p>Researchers pursue Artificial General Intelligence (AGI) — systems that match human cognitive flexibility across arbitrary tasks. Meanwhile, questions of AI safety, bias, copyright, and economic displacement remain urgent challenges for society and policymakers worldwide.</p>
+    `
+  },
+  {
+    id:'dna', emoji:'🧬', bg:'linear-gradient(135deg,#0f1a1a,#081515)',
+    tags:['science','nature'], labels:[{cls:'tag-science',txt:'Science'},{cls:'tag-nature',txt:'Nature'}],
+    title:'DNA: The Blueprint of Life',
+    excerpt:'Deoxyribonucleic acid encodes the genetic instructions for all known living organisms and many viruses. It is literally the code of life.',
+    readTime:'9 min', date:'May 2026',
+    content: `
+      <h3>Structure of DNA</h3>
+      <p>DNA is a double helix — two strands wound around each other, connected by base pairs. The four bases are Adenine (A), Thymine (T), Guanine (G), and Cytosine (C). A pairs with T, and G pairs with C. This complementary base pairing enables faithful DNA replication.</p>
+      <h3>Discovery</h3>
+      <p>In 1953, James Watson and Francis Crick, building on Rosalind Franklin's X-ray crystallography data, published the double helix structure of DNA in Nature. This discovery is considered one of the most important scientific achievements of the 20th century.</p>
+      <h3>How Genes Work</h3>
+      <p>Genes are segments of DNA that encode proteins. The central dogma of molecular biology describes the flow: DNA → RNA → Protein. Transcription converts DNA to messenger RNA; translation converts mRNA into a protein chain at the ribosome.</p>
+      <ul>
+        <li>The human genome contains ~3 billion base pairs</li>
+        <li>Humans share ~99.9% of DNA with each other</li>
+        <li>We share ~98.7% of DNA with chimpanzees</li>
+        <li>CRISPR-Cas9 allows precise gene editing with revolutionary medical implications</li>
+      </ul>
+    `
+  },
+  {
+    id:'universe', emoji:'🌌', bg:'linear-gradient(135deg,#080d1a,#0a0a20)',
+    tags:['space','science'], labels:[{cls:'tag-space',txt:'Space'},{cls:'tag-science',txt:'Science'}],
+    title:'The Observable Universe',
+    excerpt:'93 billion light-years across, containing 2 trillion galaxies. A journey through cosmic scale, structure, and time.',
+    readTime:'15 min', date:'June 2026',
+    content: `
+      <h3>Scale and Scope</h3>
+      <p>The observable universe is the spherical region of the Universe visible from Earth, with a radius of approximately 46.5 billion light-years (93 billion ly diameter). The cosmic microwave background radiation, the afterglow of the Big Bang, forms the edge of the observable universe — it represents the farthest light that has had time to reach us in the ~13.8 billion years since the Big Bang.</p>
+      <h3>Structure</h3>
+      <p>On the largest scales, the universe is structured like a cosmic web. Galaxies cluster in groups and superclusters, separated by vast cosmic voids. Filaments of dark matter and gas connect these clusters, forming the "cosmic web" — the largest known structure in the universe.</p>
+      <ul>
+        <li>Estimated 2 trillion galaxies in the observable universe</li>
+        <li>Each galaxy contains billions to trillions of stars</li>
+        <li>The Milky Way contains 100–400 billion stars</li>
+        <li>Dark matter makes up ~27% of the universe's total energy</li>
+        <li>Dark energy makes up ~68%, driving accelerating expansion</li>
+      </ul>
+      <h3>The Big Bang</h3>
+      <p>The universe began approximately 13.787 billion years ago in an extremely hot, dense state. In the first fraction of a second, it underwent exponential inflation. Over billions of years, matter coalesced into stars, galaxies, and planets. The universe continues to expand, and this expansion is accelerating due to dark energy.</p>
+    `
+  },
+  {
+    id:'silk', emoji:'🗺️', bg:'linear-gradient(135deg,#1a1510,#151008)',
+    tags:['history','culture'], labels:[{cls:'tag-history',txt:'History'},{cls:'tag-culture',txt:'Culture'}],
+    title:'The Silk Road',
+    excerpt:'For over 1,500 years, the Silk Road connected East and West, enabling trade, cultural exchange, and the spread of ideas, religions, and diseases.',
+    readTime:'11 min', date:'May 2026',
+    content: `
+      <h3>Overview</h3>
+      <p>The Silk Road was a network of trade routes connecting China, Central Asia, South Asia, the Middle East, East Africa, and Europe. Active from around 200 BCE to 1450 CE, it was not a single road but a shifting network of overland and maritime routes.</p>
+      <h3>What Traveled the Road</h3>
+      <ul>
+        <li><strong>Silk:</strong> China's most prized export, giving the route its name</li>
+        <li><strong>Spices:</strong> Pepper, cinnamon, cardamom from India and Southeast Asia</li>
+        <li><strong>Ideas:</strong> Buddhism spread from India to East Asia; Islam spread westward</li>
+        <li><strong>Technology:</strong> Paper, gunpowder, and printing from China to Europe</li>
+        <li><strong>Disease:</strong> The Black Death (bubonic plague) traveled these routes in the 14th century</li>
+      </ul>
+      <h3>Legacy</h3>
+      <p>The Silk Road facilitated one of history's greatest exchanges of culture, technology, and disease. Cities like Samarkand, Dunhuang, and Constantinople became vibrant cosmopolitan centers. Today, China's Belt and Road Initiative (BRI) invokes the Silk Road's legacy as a framework for modern infrastructure investment across Eurasia and Africa.</p>
+    `
+  },
+  {
+    id:'photosyn', emoji:'🌱', bg:'linear-gradient(135deg,#0a1a10,#081510)',
+    tags:['science','nature'], labels:[{cls:'tag-science',txt:'Science'},{cls:'tag-nature',txt:'Nature'}],
+    title:'Photosynthesis: Life\'s Engine',
+    excerpt:'The chemical process that converts sunlight, water, and carbon dioxide into glucose and oxygen — powering nearly all life on Earth.',
+    readTime:'7 min', date:'June 2026',
+    content: `
+      <h3>The Process</h3>
+      <p>Photosynthesis occurs primarily in the chloroplasts of plant cells. The overall reaction is: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂. This converts solar energy into chemical energy stored in glucose molecules.</p>
+      <h3>Two Stages</h3>
+      <ul>
+        <li><strong>Light-dependent reactions:</strong> Occur in the thylakoid membranes. Water is split (photolysis), releasing oxygen as a byproduct. ATP and NADPH are produced.</li>
+        <li><strong>Calvin Cycle (light-independent reactions):</strong> Occur in the stroma. CO₂ is fixed using ATP and NADPH to produce glucose via the cycle discovered by Melvin Calvin.</li>
+      </ul>
+      <h3>Global Impact</h3>
+      <p>Photosynthesis is the foundation of nearly all food chains on Earth. It produces the oxygen in our atmosphere (the Great Oxygenation Event ~2.4 billion years ago transformed Earth's atmosphere, enabling complex life). Fossil fuels are the stored energy of ancient photosynthesis. Understanding and mimicking photosynthesis ("artificial photosynthesis") is a key goal in clean energy research.</p>
+    `
+  },
+  {
+    id:'internet', emoji:'🌐', bg:'linear-gradient(135deg,#0d0f25,#0a0d20)',
+    tags:['tech'], labels:[{cls:'tag-tech',txt:'Technology'}],
+    title:'The Internet: A Brief History',
+    excerpt:'From ARPANET to the World Wide Web to the mobile internet — how humanity connected itself into a global nervous system.',
+    readTime:'10 min', date:'June 2026',
+    content: `
+      <h3>Origins</h3>
+      <p>The internet grew from ARPANET, a US Defense Advanced Research Projects Agency (DARPA) project begun in 1969. Its first message, "lo" (a truncation of "login" after the system crashed), was sent from UCLA to Stanford on October 29, 1969.</p>
+      <h3>Key Milestones</h3>
+      <ul>
+        <li><strong>1969:</strong> ARPANET first message sent</li>
+        <li><strong>1974:</strong> TCP/IP protocol defined by Vint Cerf and Bob Kahn</li>
+        <li><strong>1983:</strong> ARPANET adopts TCP/IP; the "internet" is born</li>
+        <li><strong>1991:</strong> Tim Berners-Lee creates the World Wide Web</li>
+        <li><strong>1993:</strong> Mosaic browser makes the web accessible to all</li>
+        <li><strong>1998:</strong> Google is founded</li>
+        <li><strong>2007:</strong> iPhone launches the mobile internet era</li>
+        <li><strong>2026:</strong> ~5.5 billion people connected; AI reshapes the web</li>
+      </ul>
+      <h3>How It Works</h3>
+      <p>Data travels as packets across a global network of fiber optic cables, routers, and wireless towers. The TCP/IP protocol suite governs how data is addressed, transmitted, routed, and received. DNS (Domain Name System) translates human-readable URLs into IP addresses. HTTPS encrypts communication between browsers and servers.</p>
+    `
+  },
+  {
+    id:'blackhole', emoji:'🕳️', bg:'linear-gradient(135deg,#050508,#0a0512)',
+    tags:['space','science'], labels:[{cls:'tag-space',txt:'Space'},{cls:'tag-science',txt:'Science'}],
+    title:'Black Holes: Cosmic Singularities',
+    excerpt:'Regions of spacetime where gravity is so strong that nothing — not even light — can escape. The most extreme objects in the known universe.',
+    readTime:'13 min', date:'May 2026',
+    content: `
+      <h3>What Is a Black Hole?</h3>
+      <p>A black hole is a region in spacetime where gravity is so intense that the escape velocity exceeds the speed of light. The boundary beyond which nothing can escape is called the event horizon. At the center lies a singularity — a point of infinite density where known physics breaks down.</p>
+      <h3>Types of Black Holes</h3>
+      <ul>
+        <li><strong>Stellar black holes:</strong> Formed from collapsing stars (mass 5–100 solar masses)</li>
+        <li><strong>Supermassive black holes:</strong> Found at galactic centers (millions to billions of solar masses)</li>
+        <li><strong>Intermediate black holes:</strong> 100 to 100,000 solar masses (recently confirmed)</li>
+        <li><strong>Primordial black holes:</strong> Hypothetical; formed in the early universe</li>
+      </ul>
+      <h3>Famous Discoveries</h3>
+      <p>In 2019, the Event Horizon Telescope (EHT) captured the first image of a black hole's shadow — the supermassive black hole M87*, 6.5 billion solar masses and 55 million light-years away. In 2022, EHT imaged Sagittarius A*, the black hole at the center of our own Milky Way galaxy (4 million solar masses).</p>
+      <h3>Hawking Radiation</h3>
+      <p>Stephen Hawking theorized in 1974 that black holes emit thermal radiation due to quantum effects near the event horizon. This means black holes slowly evaporate over immense timescales — a stellar-mass black hole would take 10⁶⁷ years to evaporate.</p>
+    `
+  },
+  {
+    id:'renaissance', emoji:'🎨', bg:'linear-gradient(135deg,#1a1508,#150f05)',
+    tags:['history','culture'], labels:[{cls:'tag-history',txt:'History'},{cls:'tag-culture',txt:'Culture'}],
+    title:'The Renaissance',
+    excerpt:'A cultural and intellectual rebirth in Europe (14th–17th century) that produced Leonardo da Vinci, Michelangelo, Shakespeare, and the foundations of modern science.',
+    readTime:'11 min', date:'May 2026',
+    content: `
+      <h3>What Was the Renaissance?</h3>
+      <p>The Renaissance (French for "rebirth") was a period of intellectual, artistic, and cultural flourishing that began in Italy in the 14th century and spread throughout Europe over the next two centuries. It marked the transition from the Middle Ages to modernity.</p>
+      <h3>Key Characteristics</h3>
+      <ul>
+        <li><strong>Humanism:</strong> Focus on human potential and earthly life rather than purely religious concerns</li>
+        <li><strong>Revival of antiquity:</strong> Rediscovery and study of ancient Greek and Roman texts</li>
+        <li><strong>Scientific inquiry:</strong> Empirical observation over scholastic authority</li>
+        <li><strong>Artistic innovation:</strong> Perspective, realism, and anatomical accuracy in art</li>
+      </ul>
+      <h3>Key Figures</h3>
+      <p>Leonardo da Vinci embodied the "Renaissance Man" — artist, scientist, engineer, and inventor. Michelangelo sculpted the David and painted the Sistine Chapel ceiling. Galileo Galilei pioneered the scientific method. Niccolò Machiavelli founded modern political philosophy. William Shakespeare elevated vernacular literature to unparalleled heights.</p>
+      <h3>Legacy</h3>
+      <p>The Renaissance gave birth to modern science, democracy, capitalism, and individualism. It shattered the medieval worldview and established the intellectual framework of Western civilization that persists to this day.</p>
+    `
+  },
+  {
+    id:'climate', emoji:'🌍', bg:'linear-gradient(135deg,#0a1508,#051008)',
+    tags:['science','nature'], labels:[{cls:'tag-science',txt:'Science'},{cls:'tag-nature',txt:'Nature'}],
+    title:'Climate Change: Science & Impact',
+    excerpt:'Earth\'s climate is warming at an unprecedented rate due to human greenhouse gas emissions. Understanding the science is the first step toward solutions.',
+    readTime:'14 min', date:'June 2026',
+    content: `
+      <h3>The Greenhouse Effect</h3>
+      <p>The greenhouse effect is a natural process where certain gases in Earth's atmosphere trap heat from the sun. Without it, Earth's average temperature would be -18°C instead of +15°C. Human activities — primarily burning fossil fuels — have dramatically increased concentrations of greenhouse gases, intensifying this effect.</p>
+      <h3>Key Greenhouse Gases</h3>
+      <ul>
+        <li><strong>CO₂:</strong> Now at 422 ppm (parts per million), highest in 3 million years</li>
+        <li><strong>Methane (CH₄):</strong> 80× more potent than CO₂ over 20 years; from agriculture and fossil fuels</li>
+        <li><strong>Nitrous oxide (N₂O):</strong> From agriculture and industrial processes</li>
+        <li><strong>Fluorinated gases:</strong> Industrial; extremely long-lived in the atmosphere</li>
+      </ul>
+      <h3>Observed Impacts</h3>
+      <p>Global average temperature has risen ~1.2°C since the pre-industrial era. Sea levels are rising ~3.6mm/year. Arctic sea ice is declining ~13% per decade. Extreme weather events (heat waves, heavy rainfall, droughts) are becoming more frequent and intense. Coral bleaching threatens marine ecosystems worldwide.</p>
+      <h3>Solutions</h3>
+      <p>Mitigation strategies include rapid decarbonization of energy, transport, and industry; electrification; renewable energy deployment; reforestation; and carbon capture. The Paris Agreement (2015) aims to limit warming to 1.5°C above pre-industrial levels — a target that requires urgent, unprecedented global action.</p>
+    `
+  },
+  {
+    id:'blockchain', emoji:'⛓️', bg:'linear-gradient(135deg,#0f1225,#0a0f1e)',
+    tags:['tech'], labels:[{cls:'tag-tech',txt:'Technology'}],
+    title:'Blockchain Technology Explained',
+    excerpt:'A distributed ledger that records transactions across a network of computers. The technology behind cryptocurrency and much more.',
+    readTime:'9 min', date:'June 2026',
+    content: `
+      <h3>What Is a Blockchain?</h3>
+      <p>A blockchain is a distributed ledger — a database shared and synchronized across a network of computers. Transactions are grouped into "blocks" and linked cryptographically into a "chain." Once recorded, data in a block is extremely difficult to alter without altering all subsequent blocks and gaining consensus from the network.</p>
+      <h3>How It Works</h3>
+      <ul>
+        <li>A transaction is initiated and broadcast to the peer-to-peer network</li>
+        <li>Network nodes validate the transaction using consensus mechanisms (Proof of Work, Proof of Stake, etc.)</li>
+        <li>The validated transaction is combined with other transactions into a new block</li>
+        <li>The block is added to the chain — creating a permanent, unalterable record</li>
+      </ul>
+      <h3>Applications Beyond Cryptocurrency</h3>
+      <p>While Bitcoin popularized blockchain in 2009, the technology has applications far beyond finance. Smart contracts (self-executing code on blockchains like Ethereum) enable decentralized finance (DeFi), supply chain tracking, digital identity, voting systems, and non-fungible tokens (NFTs). Enterprises use private blockchains for secure data sharing.</p>
+    `
+  }
+];
+
+const dykFacts = [
+  "A day on Venus is longer than a year on Venus — it rotates so slowly that it completes an orbit of the Sun before it finishes one rotation.",
+  "The human brain generates enough electricity to power a small LED bulb.",
+  "Honey never spoils. Archaeologists have found 3,000-year-old honey in Egyptian tombs that was still edible.",
+  "Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid of Giza.",
+  "There are more possible iterations of a game of chess than there are atoms in the observable universe.",
+  "Octopuses have three hearts, blue blood, and nine brains — one central brain and one for each arm.",
+];
+
+// ─── STATE ───
+let currentCat = 'all';
+
+// ─── INIT ───
+window.onload = function() {
+  // Random DYK
+  document.getElementById('dyk-text').textContent = dykFacts[Math.floor(Math.random()*dykFacts.length)];
+  renderCards(articles);
+};
+
+// ─── LOGIN ───
+function doLogin() {
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value.trim();
+  const err = document.getElementById('error-msg');
+  if (u === 'admin' && p === 'admin') {
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('wiki-page').style.display = 'block';
+    err.style.display = 'none';
+  } else {
+    err.style.display = 'block';
+    // Re-trigger shake animation
+    err.style.animation = 'none';
+    void err.offsetWidth;
+    err.style.animation = 'shake 0.4s ease';
+  }
+}
+function doLogout() {
+  document.getElementById('wiki-page').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+}
+
+// Allow Enter key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.getElementById('login-page').style.display !== 'none') doLogin();
+});
+
+// ─── CARDS ───
+function renderCards(list) {
+  const grid = document.getElementById('cards-grid');
+  document.getElementById('article-count').textContent = list.length + ' articles';
+  if (!list.length) {
+    grid.innerHTML = '<p style="color:var(--muted);padding:24px 0;">No articles found.</p>';
+    return;
+  }
+  grid.innerHTML = list.map((a, i) => `
+    <div class="article-card" onclick="openModal('${a.id}')" style="animation-delay:${i*0.06}s">
+      <div class="card-thumb" style="background:${a.bg}">${a.emoji}</div>
+      <div class="card-body">
+        <div class="card-tags">${a.labels.map(l=>`<span class="tag ${l.cls}">${l.txt}</span>`).join('')}</div>
+        <h3>${a.title}</h3>
+        <p>${a.excerpt}</p>
+        <div class="card-meta">
+          <span class="read-time">⏱ ${a.readTime} read</span>
+          <span>${a.date}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── FILTER ───
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const q = document.getElementById('search-input').value.toLowerCase();
+  applyFilters(cat, q);
+}
+function filterArticles(q) {
+  applyFilters(currentCat, q.toLowerCase());
+}
+function applyFilters(cat, q) {
+  let list = articles;
+  if (cat !== 'all') list = list.filter(a => a.tags.includes(cat));
+  if (q) list = list.filter(a => a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q));
+  renderCards(list);
+}
+
+// ─── MODAL ───
+function openModal(id) {
+  const a = articles.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('modal-content-inner').innerHTML = `
+    <div class="modal-emoji">${a.emoji}</div>
+    <div class="modal-tags">${a.labels.map(l=>`<span class="tag ${l.cls}">${l.txt}</span>`).join('')}</div>
+    <h2>${a.title}</h2>
+    <div class="modal-meta">
+      <span>⏱ ${a.readTime} read</span>
+      <span>📅 ${a.date}</span>
+      <span>📖 WikiVault Encyclopedia</span>
+    </div>
+    <hr class="modal-divider" />
+    <div class="modal-content">${a.content}</div>
+    <div class="modal-footer">
+      <span style="font-size:13px;color:var(--muted);">© WikiVault Encyclopedia 2026</span>
+      <button class="btn-share" onclick="alert('Link copied to clipboard!')">🔗 Share Article</button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOnBg(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Escape key closes modal
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
